@@ -1,28 +1,55 @@
 const inquirer = require('inquirer')
 const fs = require('fs')
-const {circle, square, triangle} = require('./lib/shapes')
+const {Circle, Square, Triangle} = require('./lib/shapes')
 
-function generateLogo(shapeType, text, shapeColor, textColor){
-    let svg
+function createSVG(shapeType, txt, shapeClr, txtClr) {
+    
+    let svgShape;
+
+    switch (shapeType) {
+        case 'Circle':
+            svgShape = new Circle(shapeClr, txt, txtClr);
+            break;
+        case 'Square':
+            svgShape = new Square(shapeClr, txt, txtClr)
+        
+            break;
+        case 'Triangle':
+            svgShape = new Triangle(shapeClr, txt, txtClr)
+            break;
+        default:
+            svgShape = '';
+            break;
+    }
+
+    return svgShape;
 }
+
 inquirer.prompt([
     {
         type: 'list',
         name: 'shape',
         message: 'Please select shape',
-        choices: ['circle', 'square', ]
-    },
-    {
-        type: 'input',
-        name: 'name',
-        message: 'Please enter Company Acronym: (no more than 3 letters)'
+        choices: ['Circle', 'Square', 'Triangle' ]
     },
     {
         type: 'input',
         name: 'shapeColor',
         message: 'Enter in logo color'
+    },
+    {
+        type: 'input',
+        name: 'name',
+        message: 'Please enter Company Acronym: (no more than 3 letters)'
+        
+    },
+    {
+        type: 'input',
+        name: 'textColor',
+        message: 'Enter the text color:'
     }
-]).then((answers) => {
-    const createdSVG = GenerateSVG(answers.shape, answers.text, answers.shapeColor, answers.textColor);
-    fs.writeToFile(createdSVG)
+]).then((data) => {
+    const createdSVG = createSVG(data.shape, data.txt, data.shapeClr, data.textClr)
+    fs.writeFileSync('Logo.svg', createdSVG.render());
+    console.log('SVG Logo has been created!');
 })
